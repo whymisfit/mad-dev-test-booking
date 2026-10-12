@@ -1,25 +1,39 @@
 {
-  "name": "mad-devs-test-booking",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.4.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.4.0",
-    "typescript": "^5"
-  },
-  "packageManager": "pnpm@11.4.0"
+    "name": "mad-devs-test-booking",
+    "version": "0.1.0",
+    "private": true,
+    "author": {
+        "email": "seregabigjopa@yandex.ru",
+        "name": "Sergey Volchkov"
+    },
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint"
+    },
+    "dependencies": {
+        "@mantine/core": "^9.7.1",
+        "@mantine/dates": "^9.7.1",
+        "@mantine/form": "^9.7.1",
+        "@mantine/hooks": "^9.7.1",
+        "@mantine/notifications": "^9.7.1",
+        "next": "16.4.0",
+        "react": "19.3.0",
+        "react-dom": "19.3.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "eslint": "^10.12.0",
+        "eslint-config-next": "16.4.0",
+        "eslint-plugin-boundaries": "^7.2.0",
+        "eslint-plugin-simple-import-sort": "^14.0.0",
+        "prettier": "^3.9.10",
+        "typescript": "^5",
+        "typescript-eslint": "^8.71.1"
+    },
+    "packageManager": "pnpm@11.4.0"
 }
