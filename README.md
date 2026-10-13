@@ -2,6 +2,10 @@
 
 ## How to build
 
+```bash
+cp .env.example .env
+```
+
 Use pnpm (see package.json).
 
 ```bash
