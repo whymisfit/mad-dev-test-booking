@@ -3,4 +3,6 @@ export const Environment = {
     isProduction: process.env.NODE_ENV === 'production',
 
     isConsoleLoggingEnabled: process.env.NEXT_PUBLIC_IS_CONSOLE_LOGGING_ENABLED === '1',
+
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || '',
 };

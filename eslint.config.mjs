@@ -6,6 +6,7 @@ import { cwd } from 'process';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from './prettier.config.js';
 
 const project = './tsconfig.json';
@@ -20,6 +21,7 @@ const eslintConfig = defineConfig([
         'out/**',
         'build/**',
         'next-env.d.ts',
+        'postcss.config.cjs',
     ]),
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
@@ -37,6 +39,7 @@ const eslintConfig = defineConfig([
         plugins: {
             '@typescript-eslint': tseslint.plugin,
             'simple-import-sort': simpleImportSort,
+            prettier: prettierPlugin,
         },
         rules: {
             indent: 'off',

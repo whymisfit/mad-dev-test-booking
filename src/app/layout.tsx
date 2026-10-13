@@ -1,13 +1,18 @@
-import type { Metadata } from 'next';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+import '@mantine/schedule/styles.css';
+
 import {
     ColorSchemeScript,
     type MantineColorScheme,
     mantineHtmlProps,
     MantineProvider,
 } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import type { Metadata } from 'next';
+
+import { MainLayout } from '@/layouts/MainLayout/ui';
 
 export const metadata: Metadata = {
     title: 'Booking app',
@@ -27,7 +32,8 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
 
             <body>
                 <MantineProvider defaultColorScheme={defaultMantineTheme}>
-                    {children}
+                    <Notifications position="top-right" />
+                    <MainLayout>{children}</MainLayout>
                 </MantineProvider>
             </body>
         </html>
