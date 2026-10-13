@@ -4,7 +4,11 @@ import { NotificationData, notifications } from '@mantine/notifications';
 import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
-import { BookingErrorCode, type BookingRepository, HttpBookingRepository } from '@/entities/Booking/api';
+import {
+    BookingErrorCode,
+    type BookingRepository,
+    HttpBookingRepository,
+} from '@/entities/Booking/api';
 import {
     type Booking,
     type BookingDraft,
@@ -12,7 +16,7 @@ import {
     bookingIssueMessage,
     getMoscowNow,
     isBookingStarted,
-    toBookingDraft
+    toBookingDraft,
 } from '@/entities/Booking/model';
 import { ApiError } from '@/shared/api/ApiError';
 import { httpClient } from '@/shared/api/httpClient';
@@ -27,7 +31,7 @@ import {
     entryFromWeekSlot,
     formatCreatedMessage,
     getVisibleRange,
-    shiftAnchorDate
+    shiftAnchorDate,
 } from '../lib';
 
 export type SubmitResult = 'created' | 'updated' | 'error';
