@@ -1,3 +1,4 @@
+export { BookingDateRequireError } from './BookingDateRequireError';
 export {
     type BookingEntry,
     type BookingFormSeed,
@@ -5,6 +6,7 @@ export {
     entryFromMonthDay,
     entryFromWeekSlot,
 } from './bookingEntry';
+export { bookingMoveDraft, bookingMoveIssue, isSameBookingSlot } from './bookingMove';
 export {
     CalendarView,
     type DateRange,
@@ -14,4 +16,3 @@ export {
     shiftAnchorDate,
 } from './calendarPeriod';
 export { formatCreatedMessage, formatDeleteQuestion } from './formatBooking';
-export { BookingDateRequireError } from './BookingDateRequireError';

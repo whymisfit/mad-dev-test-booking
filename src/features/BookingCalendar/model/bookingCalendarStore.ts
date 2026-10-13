@@ -21,12 +21,15 @@ import type { ISODateString } from '@/shared/lib/datetimes';
 import {
     type BookingEntry,
     type BookingFormSeed,
+    bookingMoveDraft,
+    bookingMoveIssue,
     CalendarView,
     entryFromBookButton,
     entryFromMonthDay,
     entryFromWeekSlot,
     formatCreatedMessage,
     getVisibleRange,
+    isSameBookingSlot,
     shiftAnchorDate
 } from '../lib';
 
@@ -65,6 +68,10 @@ interface BookingCalendarActions {
     requestDelete: (booking: Booking) => void;
     confirmDelete: () => Promise<void>;
     cancelDelete: () => void;
+    canDragBooking: (id: string) => boolean;
+    canDropBooking: (id: string, start: string, end: string) => boolean;
+    moveBooking: (id: string, start: string, end: string) => Promise<void>;
+    notifyRejectedMove: (id: string, start: string, end: string) => void;
 }
 
 export type BookingCalendarState = BookingCalendarData & BookingCalendarActions;
@@ -127,6 +134,29 @@ export const createBookingCalendarStore = (
             message: formatCreatedMessage(booking),
             color,
         });
+    };
+
+    const showMoveError = (message: string) => {
+        notifications.show({
+            title: "Couldn't move the booking",
+            message,
+            color: 'red',
+        });
+    };
+    /**
+     * WHY: Drops can overlap. Later moves must not be overwritten by an earlier response.
+     */
+    let moveQueue: Promise<void> = Promise.resolve();
+
+    const enqueueMove = (task: () => Promise<void>): Promise<void> => {
+        const run = moveQueue.then(task, task);
+
+        moveQueue = run.then(
+            () => undefined,
+            () => undefined,
+        );
+
+        return run;
     };
 
     return createStore<BookingCalendarState>()((set, get) => ({
@@ -352,6 +382,75 @@ export const createBookingCalendarStore = (
             }
 
             set({ deleteTarget: null, submitError: null });
+        },
+
+        canDragBooking: (id) => {
+            const booking = get().bookings.find((item) => item.id === id);
+
+            if (!booking) {
+                return false;
+            }
+
+            return !isBookingStarted(booking, getMoscowNow());
+        },
+
+        canDropBooking: (id, start, end) => {
+            const booking = get().bookings.find((item) => item.id === id);
+
+            if (!booking) {
+                return false;
+            }
+
+            return bookingMoveIssue(booking, get().bookings, start, end, getMoscowNow()) === null;
+        },
+
+        /**
+         * WHY: The card stays on its current slot until the API accepts the move.
+         * A failed response leaves the list untouched.
+         */
+        moveBooking: (id, start, end) =>
+            enqueueMove(async () => {
+                const booking = get().bookings.find((item) => item.id === id);
+
+                const draft = booking ? bookingMoveDraft(booking, start, end) : null;
+
+                if (!booking || !draft || isSameBookingSlot(booking, draft)) {
+                    return;
+                }
+
+                try {
+                    const updated = await repository.update(booking.id, draft);
+                    set({
+                        bookings: get().bookings.map((item) =>
+                            item.id === updated.id ? updated : item,
+                        ),
+                    });
+
+                    showSuccessNotice('Meeting room updated', draft);
+
+                    await get().loadBookings('refresh');
+                } catch (error) {
+                    showMoveError(saveErrorMessage(error));
+
+                    await get().loadBookings('refresh');
+                }
+            }),
+
+        notifyRejectedMove: (id, start, end) => {
+            const booking = get().bookings.find((item) => item.id === id);
+
+            if (!booking) {
+                showMoveError(bookingIssueMessage(BookingIssue.NotFound));
+                return;
+            }
+
+            const issue = bookingMoveIssue(booking, get().bookings, start, end, getMoscowNow());
+
+            if (!issue) {
+                return;
+            }
+
+            showMoveError(bookingIssueMessage(issue));
         },
     }));
 };

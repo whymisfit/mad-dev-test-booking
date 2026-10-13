@@ -1,5 +1,4 @@
 'use client';
-import { formatMinutes, isWeekend, splitDateTime, toDateString, toDateTimeString } from '@/shared/lib/datetimes';
 import {
     DayOfWeek,
     type MonthViewProps,
@@ -11,6 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 
 import { BookingConstraints, getMoscowNow, isSlotInThePast } from '@/entities/Booking/model';
+import { formatMinutes, isWeekend, splitDateTime, toDateString, toDateTimeString } from '@/shared/lib/datetimes';
 
 import { CalendarView, formatPeriodLabel } from '../../../../lib';
 import { useBookingCalendarStore } from '../../../../model';
@@ -30,6 +30,8 @@ const renderEvent: NonNullable<WeekViewProps['renderEvent']> = (event, eventProp
     <BookingEventCard event={event} eventProps={eventProps} />
 );
 
+const eventId = (id: string | number): string => String(id);
+
 const isCalendarView = (view: string): view is CalendarView =>
     view === CalendarView.Week || view === CalendarView.Month;
 
@@ -43,6 +45,10 @@ export const BookingSchedule = () => {
     const shiftPeriod = useBookingCalendarStore((state) => state.shiftPeriod);
     const openFromWeekSlot = useBookingCalendarStore((state) => state.openFromWeekSlot);
     const openFromMonthDay = useBookingCalendarStore((state) => state.openFromMonthDay);
+    const canDragBooking = useBookingCalendarStore((state) => state.canDragBooking);
+    const canDropBooking = useBookingCalendarStore((state) => state.canDropBooking);
+    const moveBooking = useBookingCalendarStore((state) => state.moveBooking);
+    const notifyRejectedMove = useBookingCalendarStore((state) => state.notifyRejectedMove);
     const [clockTick, setClockTick] = useState(0);
     const [isCalendarReady, setIsCalendarReady] = useState(false);
 
@@ -159,6 +165,10 @@ export const BookingSchedule = () => {
 
             {isCalendarReady ? (
                 <Schedule
+                    canDragEvent={(event) => canDragBooking(eventId(event.id))}
+                    canDropEvent={({ end, event, start }) =>
+                        canDropBooking(eventId(event.id), start, end)
+                    }
                     date={date}
                     events={events}
                     layout="default"
@@ -170,6 +180,20 @@ export const BookingSchedule = () => {
                             setDate(nextDate);
                         }
                     }}
+                    onEventDrop={({ eventId: droppedId, newEnd, newStart }) => {
+                        void moveBooking(eventId(droppedId), newStart, newEnd);
+                    }}
+                    onEventPlacementRejected={(placement) => {
+                        if (placement.action !== 'drop') {
+                            return;
+                        }
+
+                        notifyRejectedMove(
+                            eventId(placement.event.id),
+                            placement.start,
+                            placement.end,
+                        );
+                    }}
                     onViewChange={(next) => {
                         if (isCalendarView(next)) {
                             setView(next);
@@ -177,6 +201,7 @@ export const BookingSchedule = () => {
                     }}
                     view={view}
                     weekViewProps={weekViewProps}
+                    withEventsDragAndDrop
                 />
             ) : null}
         </>
