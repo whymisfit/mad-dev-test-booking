@@ -97,7 +97,7 @@ export const createBookingCalendarStore = (
      * WHY: A slower list response for the previous range must not overwrite
      * bookings for the range the user is looking at now.
      */
-    let listAbortController: AbortController | null = null;
+    let previousListAbortController: AbortController | null = null;
 
     const showEntry = (
         set: (partial: Partial<BookingCalendarData>) => void,
@@ -159,10 +159,10 @@ export const createBookingCalendarStore = (
         },
 
         loadBookings: async (mode = 'replace') => {
-            listAbortController?.abort();
+            previousListAbortController?.abort();
 
             const controller = new AbortController();
-            listAbortController = controller;
+            previousListAbortController = controller;
 
             const range = getVisibleRange(get().view, get().date);
 
