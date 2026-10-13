@@ -1,6 +1,7 @@
 import { ISO_DATE_FORMAT, type ISODateString, parseDate } from '@/shared/lib/datetimes';
 import type { Dayjs } from '@/shared/lib/dayjs';
-import { BookingDateRequireError } from '@/features/BookingCalendar/lib/BookingDateRequireError';
+
+import { BookingDateRequireError } from './BookingDateRequireError';
 
 export const CalendarView = {
     Week: 'week',
@@ -57,9 +58,7 @@ export const shiftAnchorDate = (
 
     const valueMove = direction === 'back' ? -1 : 1;
 
-    const unit = view === CalendarView.Week ? 'week' : 'month';
-
-    return day.add(valueMove, unit).format(ISO_DATE_FORMAT);
+    return day.add(valueMove, view).format(ISO_DATE_FORMAT);
 };
 
 export const formatPeriodLabel = (view: CalendarView, anchor: ISODateString): string => {

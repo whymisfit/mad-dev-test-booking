@@ -9,7 +9,6 @@ import classes from './BookingCalendar.module.css';
 import { BookingFormModal, BookingSchedule, DeleteBookingModal } from './components';
 
 export const BookingCalendar = () => {
-    const bookings = useBookingCalendarStore((state) => state.bookings);
     const loadStatus = useBookingCalendarStore((state) => state.loadStatus);
     const loadError = useBookingCalendarStore((state) => state.loadError);
     const loadBookings = useBookingCalendarStore((state) => state.loadBookings);
@@ -43,7 +42,7 @@ export const BookingCalendar = () => {
 
     return (
         <Stack gap="md">
-            {loadStatus === 'error' ? (
+            {loadStatus === 'error' && (
                 <Alert color="red" title="Couldn't load bookings">
                     <Stack align="flex-start" gap="sm">
                         <Text>{loadError}</Text>
@@ -59,13 +58,7 @@ export const BookingCalendar = () => {
                         </Button>
                     </Stack>
                 </Alert>
-            ) : null}
-
-            {loadStatus === 'ready' && bookings.length === 0 ? (
-                <Text c="dimmed" size="sm">
-                    No bookings in this period.
-                </Text>
-            ) : null}
+            )}
 
             <Box className={classes.schedule}>
                 <LoadingOverlay visible={loadStatus === 'loading'} />
