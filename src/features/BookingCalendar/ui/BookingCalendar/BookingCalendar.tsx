@@ -1,7 +1,6 @@
 'use client';
 
 import { Alert, Box, Button, LoadingOverlay, Stack, Text } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 
 import { useBookingCalendarStore } from '../../model';
@@ -12,8 +11,6 @@ export const BookingCalendar = () => {
     const loadStatus = useBookingCalendarStore((state) => state.loadStatus);
     const loadError = useBookingCalendarStore((state) => state.loadError);
     const loadBookings = useBookingCalendarStore((state) => state.loadBookings);
-    const createdNotice = useBookingCalendarStore((state) => state.createdNotice);
-    const clearCreatedNotice = useBookingCalendarStore((state) => state.clearCreatedNotice);
 
     useEffect(() => {
         const loadVisibleBookings = () => {
@@ -22,23 +19,6 @@ export const BookingCalendar = () => {
 
         loadVisibleBookings();
     }, [loadBookings]);
-
-    useEffect(() => {
-        const showCreatedNotice = () => {
-            if (!createdNotice) {
-                return;
-            }
-
-            notifications.show({
-                title: 'Meeting room booked',
-                message: createdNotice,
-            });
-
-            clearCreatedNotice();
-        };
-
-        showCreatedNotice();
-    }, [clearCreatedNotice, createdNotice]);
 
     return (
         <Stack gap="md">

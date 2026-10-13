@@ -1,5 +1,6 @@
 'use client';
 
+import { NotificationData, notifications } from '@mantine/notifications';
 import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
@@ -46,7 +47,6 @@ interface BookingCalendarData {
     submitStatus: 'idle' | 'submitting';
     submitError: string | null;
     deleteTarget: Booking | null;
-    createdNotice: string | null;
 }
 
 interface BookingCalendarActions {
@@ -65,7 +65,6 @@ interface BookingCalendarActions {
     requestDelete: (booking: Booking) => void;
     confirmDelete: () => Promise<void>;
     cancelDelete: () => void;
-    clearCreatedNotice: () => void;
 }
 
 export type BookingCalendarState = BookingCalendarData & BookingCalendarActions;
@@ -118,6 +117,18 @@ export const createBookingCalendarStore = (
         });
     };
 
+    const showSuccessNotice = (
+        title: string,
+        booking: BookingDraft,
+        color: NotificationData['color'] = 'blue',
+    ) => {
+        notifications.show({
+            title,
+            message: formatCreatedMessage(booking),
+            color,
+        });
+    };
+
     return createStore<BookingCalendarState>()((set, get) => ({
         view: CalendarView.Week,
         date: getMoscowNow().date,
@@ -128,7 +139,6 @@ export const createBookingCalendarStore = (
         submitStatus: 'idle',
         submitError: null,
         deleteTarget: null,
-        createdNotice: null,
 
         setView: (view) => {
             if (get().view === view) {
@@ -270,6 +280,8 @@ export const createBookingCalendarStore = (
 
                     set({ dialog: { type: 'closed' }, submitStatus: 'idle', submitError: null });
 
+                    showSuccessNotice('Meeting room updated', normalizedBookingDraft);
+
                     await get().loadBookings('refresh');
 
                     return 'updated';
@@ -281,8 +293,9 @@ export const createBookingCalendarStore = (
                     dialog: { type: 'closed' },
                     submitStatus: 'idle',
                     submitError: null,
-                    createdNotice: formatCreatedMessage(normalizedBookingDraft),
                 });
+
+                showSuccessNotice('Meeting room booked', normalizedBookingDraft, 'green');
 
                 await get().loadBookings('refresh');
 
@@ -323,6 +336,8 @@ export const createBookingCalendarStore = (
 
                 set({ deleteTarget: null, submitStatus: 'idle', submitError: null });
 
+                showSuccessNotice('Meeting room deleted', target, 'red');
+
                 await get().loadBookings('refresh');
             } catch (error) {
                 set({ submitStatus: 'idle', submitError: saveErrorMessage(error) });
@@ -337,10 +352,6 @@ export const createBookingCalendarStore = (
             }
 
             set({ deleteTarget: null, submitError: null });
-        },
-
-        clearCreatedNotice: () => {
-            set({ createdNotice: null });
         },
     }));
 };

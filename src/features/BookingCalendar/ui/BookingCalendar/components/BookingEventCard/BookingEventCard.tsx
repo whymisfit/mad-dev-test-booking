@@ -49,9 +49,10 @@ export const BookingEventCard = ({
                     {children}
                 </UnstyledButton>
             </HoverCard.Target>
+
             <HoverCard.Dropdown>
                 <Stack gap="xs">
-                    {booking.title ? <Text fw={600}>{booking.title}</Text> : null}
+                    {booking.title && <Text fw={600}>{booking.title}</Text>}
 
                     <Text size="sm">
                         {formatBookingWhen(booking.date, booking.start, booking.end)}

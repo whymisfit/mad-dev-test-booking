@@ -35,7 +35,7 @@ export const toBookingDraft = (input: {
         end: input.end,
     };
 
-    if (!title) {
+    if (title) {
         bookingDraft.title = title;
     }
 
